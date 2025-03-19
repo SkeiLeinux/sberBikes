@@ -1,0 +1,21 @@
+datasets:
+  kadzo.v2023.validators.groups:
+    title: Валидаторы групп
+    description: Реестр ошибок в группах
+    origin:
+      obj_by_domains: kadzo.v2023.groups_by_domains
+      groups: kadzo.v2023.groups
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.groups";
+          $schema := entities_schema."kadzo.v2023.groups".schema;
+          $groups := groups;
+      
+          $errors := $each(validators.kadzo."groups.validation", function($v, $k){(
+                 $eval($v, {'groups': $groups}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'groups', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

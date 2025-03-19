@@ -1,0 +1,21 @@
+datasets:
+  kadzo.v2023.validators.tasks:
+    title: Валидаторы задач IT
+    description: Реестр ошибок в задачах IT
+    origin:
+      obj_by_domains: kadzo.v2023.tasks_by_domains
+      tasks: kadzo.v2023.tasks
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.tasks";
+          $tasks := tasks;
+          $schema := entities_schema."kadzo.v2023.tasks".schema;
+      
+          $errors := $each(validators.kadzo."tasks.validation", function($v, $k){(
+                 $eval($v, {'tasks': $tasks}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'tasks', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

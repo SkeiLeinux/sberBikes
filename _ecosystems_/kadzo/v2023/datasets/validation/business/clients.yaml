@@ -1,0 +1,23 @@
+datasets:
+  kadzo.v2023.validators.clients:
+    title: Валидаторы клиентов
+    description: Реестр ошибок в описании клиентов
+    origin:
+      obj_by_domains: kadzo.v2023.clients_by_domains
+      clients: kadzo.v2023.clients
+      channels: kadzo.v2023.channels
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.clients";
+          $schema := entities_schema."kadzo.v2023.clients".schema;
+          $clients := clients;
+          $channels := channels;
+      
+          $errors := $each(validators.kadzo."clients.validation", function($v, $k){(
+                 $eval($v, {'clients': $clients, 'channels': $channels}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'clients', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

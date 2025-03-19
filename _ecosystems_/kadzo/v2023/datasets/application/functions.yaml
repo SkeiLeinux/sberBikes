@@ -1,0 +1,20 @@
+datasets:
+  kadzo.v2023.functions:
+    source: >
+      (
+          {"kadzo.v2023.functions": $merge([$."kadzo.v2023.functions", $eval($eval(kadzo.settings.kadzo_functions_functions))."kadzo.v2023.functions"])};
+      )
+
+  kadzo.v2023.functions.united:
+    origin:
+      base: "($)"
+      functions: kadzo.v2023.functions
+    source: >
+      (
+          $functions := functions;
+          $base := base;
+          {
+              "kadzo.v2023.functions" : $merge([$functions."kadzo.v2023.functions".$spread(),
+                                          $base.aspects.$spread()[*.sber.object = "function"].{$keys()[0] : $merge([{"title": $.*.title}, $.*.sber])}])
+          }
+      )

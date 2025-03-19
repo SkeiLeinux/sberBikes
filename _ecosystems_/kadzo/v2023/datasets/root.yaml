@@ -1,0 +1,15 @@
+imports:
+  - business/root.yaml
+  - information/root.yaml
+  - application/root.yaml
+  - technical/root.yaml
+  - validation/root.yaml
+  - kadzo.yaml
+  - sber_settings.yaml
+  - entities_schema.yaml
+  - entities_refs.yaml
+  - entities.yaml
+  - objects_by_domains/_root.yaml
+  - widgets.yaml
+  - arch_schema.yaml
+  - rules_exception.yaml

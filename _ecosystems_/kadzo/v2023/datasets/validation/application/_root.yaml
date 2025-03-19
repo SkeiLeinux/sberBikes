@@ -1,0 +1,8 @@
+imports:
+  - functions.yaml
+  - groups.yaml
+  - integrations.yaml
+  - kb_systems.yaml
+  - systems.yaml
+  - tasks.yaml
+  - endpoints.yaml

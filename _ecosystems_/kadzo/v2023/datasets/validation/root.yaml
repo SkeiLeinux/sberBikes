@@ -1,0 +1,11 @@
+imports:
+  - business/_root.yaml
+  - information/_root.yaml
+  - application/_root.yaml
+  - technical/_root.yaml
+  - validators_domain.yaml
+  - validator_unified_elements.yaml
+  - validator_criticality_passports.yaml
+  - validators.yaml
+  - validation_domain_enterprise.yaml
+  - completeness.yaml

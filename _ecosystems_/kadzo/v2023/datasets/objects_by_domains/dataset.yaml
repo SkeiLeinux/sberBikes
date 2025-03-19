@@ -1,0 +1,250 @@
+datasets:
+  kadzo.v2023.objects_by_domains:
+    title: Маппинг ключей объектов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      goals: kadzo.v2023.goals_by_domains
+      strategy: kadzo.v2023.strategy_by_domains
+      clients: kadzo.v2023.clients_by_domains
+      channels: kadzo.v2023.channels_by_domains
+      products: kadzo.v2023.products_by_domains
+      processes: kadzo.v2023.processes_by_domains
+      business_objects: kadzo.v2023.business_objects_by_domains
+      data_objects: kadzo.v2023.data_objects_by_domains
+      groups: kadzo.v2023.groups_by_domains
+      systems: kadzo.v2023.systems_by_domains
+      functions: kadzo.v2023.functions_by_domains
+      endpoints: kadzo.v2023.endpoints_by_domains
+      integrations: kadzo.v2023.integrations_by_domains
+      tasks: kadzo.v2023.tasks_by_domains
+      kb_systems: kadzo.v2023.kb_systems_by_domains
+      tech_services: kadzo.v2023.tech_services_by_domains
+      tech_params: kadzo.v2023.tech_params_by_domains
+    source: >
+      (
+          $merge([goals, strategies, clients, channels, products, processes,
+              business_objects, data_objects,
+              groups, systems, functions, endpoints, integrations, tasks,
+              kb_systems, tech_services, tech_params]);
+      )
+
+  kadzo.v2023.goals_by_domains:
+    title: Маппинг ключей целей на домены
+    origin:
+      base: kadzo.__sber_settings__
+      goals: kadzo.v2023.goals
+    source: >
+      (      
+          {
+              "kadzo.v2023.goals" :
+                  $get_domain_by_key_array([goals."kadzo.v2023.goals".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.strategy_by_domains:
+    title: Маппинг ключей стратегических целей на домены
+    origin:
+      base: kadzo.__sber_settings__
+      strategy: kadzo.v2023.strategy
+    source: >
+      (
+          {
+              "kadzo.v2023.strategy" :
+                  $get_domain_by_key_array([strategy."kadzo.v2023.strategy".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.clients_by_domains:
+    title: Маппинг ключей клиентов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      clients: kadzo.v2023.clients
+    source: >
+      (
+          {
+              "kadzo.v2023.clients" :
+                  $get_domain_by_key_array([clients."kadzo.v2023.clients".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.channels_by_domains:
+    title: Маппинг ключей каналов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      channels: kadzo.v2023.channels
+    source: >
+      (
+          {
+              "kadzo.v2023.channels" :
+                  $get_domain_by_key_array([channels."kadzo.v2023.channels".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.products_by_domains:
+    title: Маппинг ключей продуктов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      products: kadzo.v2023.products
+    source: >
+      (
+          {
+              "kadzo.v2023.products" :
+                  $get_domain_by_key_array([products."kadzo.v2023.products".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.processes_by_domains:
+    title: Маппинг ключей процессов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      processes: kadzo.v2023.processes
+    source: >
+      (
+          {
+              "kadzo.v2023.processes" :
+                  $get_domain_by_key_array([processes."kadzo.v2023.processes".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.business_objects_by_domains:
+    title: Маппинг ключей бизнес-объектов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      business_objects: kadzo.v2023.business_objects
+    source: >
+      (
+          {
+              "kadzo.v2023.business_objects" :
+                  $get_domain_by_key_array([business_objects."kadzo.v2023.business_objects".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.data_objects_by_domains:
+    title: Маппинг ключей объектов данных на домены
+    origin:
+      base: kadzo.__sber_settings__
+      data_objects: kadzo.v2023.data_objects
+    source: >
+      (
+          {
+              "kadzo.v2023.data_objects" :
+                  $get_domain_by_key_array([data_objects."kadzo.v2023.data_objects".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.groups_by_domains:
+    title: Маппинг ключей групп на домены
+    origin:
+      base: kadzo.__sber_settings__
+      groups: kadzo.v2023.groups
+    source: >
+      (
+          {
+              "kadzo.v2023.groups" :
+                  $get_domain_by_key_array([groups."kadzo.v2023.groups".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.systems_by_domains:
+    title: Маппинг ключей систем на домены
+    origin:
+      base: kadzo.__sber_settings__
+      systems: kadzo.v2023.systems
+    source: >
+      (
+          {
+              "kadzo.v2023.systems" :
+                  $get_domain_by_key_array([systems."kadzo.v2023.systems".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.functions_by_domains:
+    title: Маппинг ключей функций на домены
+    origin:
+      base: kadzo.__sber_settings__
+      functions: kadzo.v2023.functions
+    source: >
+      (
+          {
+              "kadzo.v2023.functions" :
+                  $get_domain_by_key_array([functions."kadzo.v2023.functions".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.endpoints_by_domains:
+    title: Маппинг ключей точек взаимодействия на домены
+    origin:
+      base: kadzo.__sber_settings__
+      endpoints: kadzo.v2023.endpoints
+    source: >
+      (
+          {
+              "kadzo.v2023.endpoints" :
+                  $get_domain_by_key_array([endpoints."kadzo.v2023.endpoints".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.integrations_by_domains:
+    title: Маппинг ключей интеграционных потоков на домены
+    origin:
+      base: kadzo.__sber_settings__
+      integrations: kadzo.v2023.integrations
+    source: >
+      (
+          {
+              "kadzo.v2023.integrations" :
+                  $get_domain_by_key_array([integrations."kadzo.v2023.integrations".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.tasks_by_domains:
+    title: Маппинг ключей задач на домены
+    origin:
+      base: kadzo.__sber_settings__
+      tasks: kadzo.v2023.tasks
+    source: >
+      (
+          {
+              "kadzo.v2023.tasks" :
+                  $get_domain_by_key_array([tasks."kadzo.v2023.tasks".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.kb_systems_by_domains:
+    title: Маппинг ключей систем КБ на домены
+    origin:
+      base: kadzo.__sber_settings__
+      kb_systems: kadzo.v2023.kb_systems
+    source: >
+      (
+          {
+              "kadzo.v2023.kb_systems" :
+                  $get_domain_by_key_array([kb_systems."kadzo.v2023.kb_systems".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.tech_services_by_domains:
+    title: Маппинг ключей технических сервисов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      tech_services: kadzo.v2023.tech_services
+    source: >
+      (
+          {
+              "kadzo.v2023.tech_services" :
+                  $get_domain_by_key_array([tech_services."kadzo.v2023.tech_services".$keys()], [base.sber.domains.$keys()])
+          }
+      )
+
+  kadzo.v2023.tech_params_by_domains:
+    title: Маппинг ключей объектов на домены
+    origin:
+      base: kadzo.__sber_settings__
+      tech_params: kadzo.v2023.tech_params
+    source: >
+      (
+          {
+              "kadzo.v2023.tech_params" :
+                  $get_domain_by_key_array([tech_params."kadzo.v2023.tech_params".$keys()], [base.sber.domains.$keys()])
+          }
+      )

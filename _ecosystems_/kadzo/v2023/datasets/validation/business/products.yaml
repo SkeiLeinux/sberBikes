@@ -1,0 +1,21 @@
+datasets:
+  kadzo.v2023.validators.products:
+    title: Валидаторы продуктов
+    description: Реестр ошибок в продуктах
+    origin:
+      obj_by_domains: kadzo.v2023.products_by_domains
+      products: kadzo.v2023.products
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.products";
+          $schema := entities_schema."kadzo.v2023.products".schema;
+          $products := products;
+      
+          $errors := $each(validators.kadzo."products.validation", function($v, $k){(
+                 $eval($v, {'products': $products}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'products', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

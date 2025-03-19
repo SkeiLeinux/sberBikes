@@ -1,0 +1,15 @@
+datasets:
+  kadzo.v2023.integrations:
+    source: >
+      (
+          $result := {"kadzo.v2023.integrations": $merge([$."kadzo.v2023.integrations", $eval($eval(kadzo.settings.kadzo_integrations_functions))."kadzo.v2023.integrations"])};
+      
+          $result~> | $ | $merge([$, 
+              { "kadzo.v2023.integrations" : $merge($map($."kadzo.v2023.integrations".$spread(), function($v, $i) {
+                                                    {
+                                                        $v.$keys()[0] : $merge([{"code": "П." & ($i+1)} , $v.*])
+                                                    }
+                                                }))
+              }
+            ]) |;
+      )

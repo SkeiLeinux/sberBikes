@@ -1,0 +1,7 @@
+imports:
+  - goals.yaml
+  - strategy.yaml
+  - clients.yaml
+  - products.yaml
+  - channels.yaml
+  - processes.yaml

@@ -1,0 +1,6 @@
+datasets:
+  kadzo.v2023.strategy:
+    source: >
+      (
+          {"kadzo.v2023.strategy": $merge([$."kadzo.v2023.strategy", $eval($eval(kadzo.settings.kadzo_strategy_functions))."kadzo.v2023.strategy"])};
+      )

@@ -1,0 +1,18 @@
+functions:
+  get_domain_by_key_array:
+    params:
+      - alias: objects_keys
+        type: array
+        required: true
+      - alias: domains
+        type: array
+        required: true
+    code: >
+      (      
+          $matcher := $eval('/^(' & $join(domains, "|") & ')\\./i');
+          $map(objects_keys, function($v) {(
+                $match := ($v ~> $matcher)[0].match;
+                {$v : {"domain": $substring($match, $length($match)-1, 1) = "." ? $substring($match, 0, $length($match) -1 ) : $match }}
+            )}
+          ) ~> $merge();
+      )

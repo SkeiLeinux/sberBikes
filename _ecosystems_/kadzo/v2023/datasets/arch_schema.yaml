@@ -1,0 +1,67 @@
+datasets:
+  kadzo.v2023.arch_schema.asis:
+    origin:
+      helpers: kadzo.v2023.__helpers__
+      kadzo: kadzo.v2023.asis
+      groups: kadzo.v2023.groups.united
+    source: >
+      (
+          $v_systems :=$sift(kadzo."kadzo.v2023.systems", function($v, $k){$not($exists($v.parent))});
+          $v_subsystems :=$sift(kadzo."kadzo.v2023.systems", function($v, $k){$exists($v.parent)});
+          $result := $eval(helpers.kadzo."helpers.functions".schema_data,
+              {
+                  "ctx": helpers, 
+                  "var": {
+                      "systems" : $v_systems,
+                      "subsystems": $scParams.hide_fp ? [] : $v_subsystems,
+                      "functions": kadzo."kadzo.v2023.functions",
+                      "groups": groups."kadzo.v2023.groups",
+                      "integrations": kadzo."kadzo.v2023.integrations",
+                      "tech_services": kadzo."kadzo.v2023.tech_services",
+                      "channels": kadzo."kadzo.v2023.channels",
+                      "clients": kadzo."kadzo.v2023.clients",
+                      "meta-inf": {"schema-type": "as-is"}
+                  }
+              }
+          );
+          {
+             "systems": $merge($map($result.systems, function($v) {({$v.id : $v})})),
+             "tech_services": $merge($map($result.tech_services, function($v) {({$v.id : $v})})),
+             "integrations": $merge($map($result.integrations, function($v) {({$v.id : $v})})),
+             "channels": $merge($map($result.channels, function($v) {({$v.id : $v})})),
+             "clients": $merge($map($result.clients, function($v) {({$v.id : $v})}))
+          }
+      )
+
+  kadzo.v2023.arch_schema.tobe:
+    origin:
+      helpers: kadzo.v2023.__helpers__
+      kadzo: kadzo.v2023.tobe
+    source: >
+      (
+          $v_systems :=$sift(kadzo."kadzo.v2023.systems", function($v, $k){$not($exists($v.parent))});
+          $v_subsystems :=$sift(kadzo."kadzo.v2023.systems", function($v, $k){$exists($v.parent)});
+          $result := $eval(helpers.kadzo."helpers.functions".schema_data,
+              {
+                  "ctx": helpers, 
+                  "var": {
+                      "systems" : $v_systems,
+                      "subsystems": $scParams.hide_fp ? [] : $v_subsystems,
+                      "functions": kadzo."kadzo.v2023.functions",
+                      "groups": kadzo."kadzo.v2023.groups",
+                      "integrations": kadzo."kadzo.v2023.integrations",
+                      "tech_services": kadzo."kadzo.v2023.tech_services",
+                      "channels": kadzo."kadzo.v2023.channels",
+                      "clients": kadzo."kadzo.v2023.clients",
+                      "meta-inf": {"schema-type": "to-be"}
+                  }
+              }
+          );
+          {
+             "systems": $merge($map($result.systems, function($v) {({$v.id : $v})})),
+             "tech_services": $merge($map($result.tech_services, function($v) {({$v.id : $v})})),
+             "integrations": $merge($map($result.integrations, function($v) {({$v.id : $v})})),
+             "channels": $merge($map($result.channels, function($v) {({$v.id : $v})})),
+             "clients": $merge($map($result.clients, function($v) {({$v.id : $v})}))
+          }
+      )

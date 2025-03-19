@@ -1,0 +1,25 @@
+datasets:
+  kadzo.v2023.validators.endpoints:
+    title: Валидаторы точек взаимодействия
+    description: Реестр ошибок в точках взаимодействия
+    origin:
+      obj_by_domains: kadzo.v2023.endpoints_by_domains
+      endpoints: kadzo.v2023.endpoints
+      systems: kadzo.v2023.systems.united
+      tech_services: kadzo.v2023.tech_services
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.endpoints";
+          $schema := entities_schema."kadzo.v2023.endpoints".schema;
+          $endpoints := endpoints;
+          $systems := systems;
+          $tech_services := tech_services;
+      
+          $errors := $each(validators.kadzo."endpoints.validation", function($v, $k){(
+                 $eval($v, {'endpoints': $endpoints, 'systems': $systems, 'tech_services': $tech_services}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'endpoints', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

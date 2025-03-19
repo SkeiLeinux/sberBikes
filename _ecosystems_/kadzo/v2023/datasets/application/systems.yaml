@@ -1,0 +1,57 @@
+datasets:
+  kadzo.v2023.systems:
+    source: >
+      (
+          $systems := $merge([$."kadzo.v2023.systems",
+                                  $eval($eval(kadzo.settings.kadzo_systems_functions))."kadzo.v2023.systems"]);
+          {
+              "kadzo.v2023.systems": $systems
+          };
+      )
+
+  kadzo.v2023.systems.united:
+    origin:
+      base: "($)"
+      systems: kadzo.v2023.systems
+    source: >
+      (
+          $base := base;
+          $systems := systems;
+          {
+            "kadzo.v2023.systems" : $merge([$systems."kadzo.v2023.systems".$spread(),
+                                    $base.components.$spread()[*.sber.object = "system"].{$keys()[0] : $merge([{"title": $.*.title}, $.*.sber])}])
+          };
+      )
+      
+  kadzo.v2023.systems.as:
+    origin: kadzo.v2023.systems
+    source: >
+      (
+        $systems := $merge("kadzo.v2023.systems".$spread()[$not(*."parent"!="")]);
+
+        { "kadzo.v2023.systems.as" : $systems };      
+      )
+
+  kadzo.v2023.systems.fp:
+    origin: kadzo.v2023
+    source: >
+      (
+              $fn := $$.kadzo."systems.validation"."parent_system";
+      
+              $wrong_fp := $eval($fn, {'systems': $$}).id;
+
+              { "kadzo.v2023.systems.fp" : $merge(
+                                                  $."kadzo.v2023.systems" ~> $each(?, function($v, $k) {(  $v.parent  != null ? {$k : $v} )})
+                                                  )
+                                              ~> | $ | {}, [$wrong_fp] |
+              };      
+      )
+
+  kadzo.v2023.systems.external_as:
+    origin: kadzo.v2023.systems
+    source: >
+      (
+        $systems := $merge("kadzo.v2023.systems".$spread()[*."location"="Внешняя"]);
+
+        { "kadzo.v2023.systems.external_as" : $systems };      
+      )

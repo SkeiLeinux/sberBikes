@@ -1,0 +1,21 @@
+datasets:
+  kadzo.v2023.validators.domain_enterprise:
+    title:  Валидаторы домена
+    description: Реестр ошибок в общих проверках
+    origin:
+      base: kadzo.__sber_settings__
+      validators: kadzo.validation.impl
+      all: "($)"
+    source: >
+      (
+          $base := base;  
+          $base.sber.kadzo.enterprise_mode = true ? (
+              $validators := validators;
+              $companies := all.companies;
+              $errors := $each($validators.kadzo."domain_enterprise.validation", function($v, $k){(
+                     $eval($v, {'dataset': $base, 'companies': $companies}).$map($, $append(?)); )} 
+                ).$map($, $append(?));
+        
+              $errors := [ $errors ~> | $ | {'validator_type': 'enterprise_domain', 'domain' : $.id} | ];
+            )            
+      )

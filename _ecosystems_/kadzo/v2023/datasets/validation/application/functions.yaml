@@ -1,0 +1,24 @@
+datasets:
+  kadzo.v2023.validators.functions:
+    title: Валидаторы функций
+    description: Реестр ошибок в функциях
+    origin:
+      obj_by_domains: kadzo.v2023.functions_by_domains
+      functions: kadzo.v2023.functions
+      systems: kadzo.v2023.systems.united
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.functions";
+          $schema := entities_schema."kadzo.v2023.functions".schema;
+          $systems := systems;
+          $functions := functions;
+      
+          $errors := $each(validators.kadzo."functions.validation", function($v, $k){(
+                 $eval($v, {'functions': $functions, 'systems': $systems, 'domain': $domain}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+      
+          $errors := [ $errors ~> | $ | {'validator_type': 'functions', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+
+      )

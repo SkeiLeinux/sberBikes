@@ -1,0 +1,23 @@
+datasets:
+  kadzo.v2023.validators.tech_params:
+    title: Валидаторы параметров ТА
+    description: Реестр ошибок в параметрах ТА
+    origin:
+      obj_by_domains: kadzo.v2023.tech_params_by_domains
+      tech_params: kadzo.v2023.tech_params
+      systems: kadzo.v2023.systems
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.tech_params";
+          $schema := entities_schema."kadzo.v2023.tech_params".schema;
+          $tech_params := tech_params;
+          $systems := systems;
+      
+          $errors := $each(validators.kadzo."tech_params.validation", function($v, $k){(
+                 $eval($v, {'tech_params': $tech_params, 'systems': $systems, 'schema': $schema}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'tech_params', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

@@ -1,0 +1,6 @@
+datasets:
+  kadzo.v2023.entities:
+    source: >
+      (
+          $.entities ~> $sift(?, function ($v, $k) { $k ~> /^kadzo\./}) 
+      )

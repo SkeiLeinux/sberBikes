@@ -1,0 +1,6 @@
+datasets:
+  kadzo.v2023.kb_systems:
+    source: >
+      (
+          {"kadzo.v2023.kb_systems": $merge([$."kadzo.v2023.kb_systems", $eval($eval(kadzo.settings.kadzo_kb_systems_functions))."kadzo.v2023.kb_systems"])};
+      )

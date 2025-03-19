@@ -1,0 +1,20 @@
+datasets:
+  kadzo.v2023.groups:
+    source: >
+      (
+          {"kadzo.v2023.groups": $merge([$."kadzo.v2023.groups", $eval($eval(kadzo.settings.kadzo_groups_functions))."kadzo.v2023.groups"])};
+      )
+
+  kadzo.v2023.groups.united:
+    origin:
+      base: "($)"
+      groups: kadzo.v2023.groups
+    source: >
+      (
+          $base := base;
+          $groups := groups;
+          {
+            "kadzo.v2023.groups" : $merge([$groups."kadzo.v2023.groups".$spread(),
+                                    $base.components.$spread()[*.sber.object = "group"].{$keys()[0] : $merge([{"title": $.*.title}, $.*.sber])}])
+          }
+      )

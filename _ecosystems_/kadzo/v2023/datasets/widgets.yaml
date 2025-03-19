@@ -1,0 +1,32 @@
+datasets:
+  kadzo.v2023.__presentations__.widgets:
+    origin:
+      base: "($)"
+      data: kadzo.v2023
+    source: >
+      (
+        $tmp:= $sift(base.entities, function($v, $k){$v.presentations.*.widgets})
+                  ~> $each(?, function($v, $key) {(
+                        {$key : $sift($v.presentations, function($v, $k){ $v.widgets }) }
+                  )})
+                      ~> $map(?, function($v){(
+                            $v.$keys() ~> /kadzo.v2023/ ? (
+                            $key := $v.$keys();
+                            $each($v.*, function($v, $k){({
+                              "entity": $key,
+                              "presentation": $k,
+                              "objects": $lookup($$.data,$key).$keys()
+                            })});
+                           )
+                      )});
+        
+        $tmp.$map($, $append(?))
+          ~> $map(?, function($obj){(
+                $key := "__widgets__." & $obj.entity & "." & $obj.presentation;
+                {
+                  $key : $merge( $map( $obj.objects, function($id){(
+                      {$id : $widgets_on_card( $lookup( $lookup($$.base.entities, $obj.entity).presentations, $obj.presentation), "id", $id) }
+                  )}))
+                }
+          )})
+      )

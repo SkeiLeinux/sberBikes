@@ -1,0 +1,49 @@
+datasets:
+  kadzo.v2023.validators.completeness_analys:
+    title:  Анализ полноты КА ДЗО
+    description: Анализ полноты КА ДЗО
+    origin:
+      ka: kadzo.v2023
+      vl: kadzo.v2023.validators
+      exceptions: kadzo.rules.exception
+      impl: kadzo.completeness.impl
+      base: ($)
+    source: >
+      (
+          $domains := base.sber.domains.$keys();
+            $rules := exceptions.$keys();
+            $companies := base.companies;
+            $company_list := $sift($companies, function($i, $k, $o){($i.is_focus = "Да")} );
+            $domains := $domains[$ in $keys($company_list)];
+            $ka := ka.$;
+            $vl := vl.$;
+            $fn := impl.kadzo."completeness"."full";
+
+            $getStat := function($v) {(
+                          $valid := $eval($fn, {'domain': $v, 'dataset' : $ka, 'validators' : $vl, 'rules' : $rules, 'impl': impl});
+                          {
+                            "company" : $lookup($company_list, $v).title,
+                            "complete" : $valid."summary",
+                            "cross" : $valid."cross",
+                            "tech_params" : $valid."tech_params",
+                            "tech_services" : $valid."tech_services",
+                            "clients" : $valid."clients",
+                            "systems" : $valid."systems",
+                            "integrations" : $valid."integrations",
+                            "processes" : $valid."processes",
+                            "channels" : $valid."channels",
+                            "products" : $valid."products",
+                            "startegy" : $valid."strategy",
+                            "goals" : $valid."goals",
+                            "business_objects" : $valid."business_objects",
+                            "data_objects" : $valid."data_objects",
+                            "kb_systems" : $valid."kb_systems",
+                            "groups" : $valid."groups",
+                            "tasks" : $valid."tasks",
+                            "functions" : $valid."functions",
+                            "link": '/entities/kadzo.v2023.full/validation.enterprise.full_md?domain=' & $v
+                          };
+                        )};
+      
+            $domains.($getStat($));          
+      )

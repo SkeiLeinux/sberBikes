@@ -1,0 +1,211 @@
+datasets:
+  kadzo.v2023:
+    origin:
+      base: ($)
+      goals: kadzo.v2023.goals
+      strategy: kadzo.v2023.strategy
+      clients: kadzo.v2023.clients
+      products: kadzo.v2023.products
+      channels: kadzo.v2023.channels
+      processes: kadzo.v2023.processes
+      business_objects: kadzo.v2023.business_objects
+      data_objects: kadzo.v2023.data_objects
+      tasks: kadzo.v2023.tasks
+      functions: kadzo.v2023.functions
+      groups: kadzo.v2023.groups
+      systems: kadzo.v2023.systems
+      kb_systems: kadzo.v2023.kb_systems
+      integrations: kadzo.v2023.integrations
+      endpoints: kadzo.v2023.endpoints
+      tech_services: kadzo.v2023.tech_services
+      tech_params: kadzo.v2023.tech_params
+    source: >
+      (
+          $base := base;
+          $goals := goals;
+          $strategy := strategy;
+          $clients := clients;
+          $products := products;
+          $channels := channels;
+          $processes := processes;
+          $data_objects := data_objects;
+          $business_objects := business_objects;
+          $tasks := tasks;
+          $functions := functions;
+          $groups := groups;
+          $systems := systems;
+          $kb_systems := kb_systems;
+          $integrations := integrations;
+          $endpoints := endpoints;
+          $tech_services := tech_services;
+          $tech_params := tech_params;
+      
+          /*$result := base ~> | $ | $merge([$,*/ 
+              {
+                  "kadzo.v2023.goals" : $goals."kadzo.v2023.goals",
+                  "kadzo.v2023.strategy" : $strategy."kadzo.v2023.strategy",
+                  "kadzo.v2023.clients" : $clients."kadzo.v2023.clients",
+                  "kadzo.v2023.products" : $products."kadzo.v2023.products",
+                  "kadzo.v2023.channels" : $channels."kadzo.v2023.channels",
+                  "kadzo.v2023.processes" : $processes."kadzo.v2023.processes",
+                  "kadzo.v2023.business_objects" : $business_objects."kadzo.v2023.business_objects",
+                  "kadzo.v2023.data_objects" : $data_objects."kadzo.v2023.data_objects",
+                  "kadzo.v2023.tasks" : $tasks."kadzo.v2023.tasks",
+                  "kadzo.v2023.functions" : $merge([$functions."kadzo.v2023.functions".$spread(),
+                                              $base.aspects.$spread()[*.sber.object = "function"].{$keys()[0] : $merge([{"title": $.*.title}, $.*.sber])}]),
+                  "kadzo.v2023.groups" : $merge([$groups."kadzo.v2023.groups".$spread(),
+                                          $base.components.$spread()[*.sber.object = "group"].{$keys()[0] : $merge([{"title": $.*.title}, $.*.sber])}]),
+                  "kadzo.v2023.systems" : $merge([$systems."kadzo.v2023.systems".$spread(),
+                                                                                    $base.components.$spread()[*.sber.object = "system"].{$keys()[0] : $merge([{"title": $.*.title}, $.*.sber])}]),
+                  "kadzo.v2023.kb_systems" : $kb_systems."kadzo.v2023.kb_systems",
+                  "kadzo.v2023.integrations" : $integrations."kadzo.v2023.integrations",
+                  "kadzo.v2023.endpoints" : $endpoints."kadzo.v2023.endpoints",
+                  "kadzo.v2023.tech_services" : $tech_services."kadzo.v2023.tech_services",
+                  "kadzo.v2023.tech_params" : $tech_params."kadzo.v2023.tech_params",
+                  "kadzo.v2023.criticality_passport" : $base."kadzo.v2023.criticality_passport"
+              } 
+          /*])|;*/
+      )
+
+  kadzo.v2023.clear:
+    origin:
+      base: "($)"
+      data: kadzo.v2023
+    source: >
+      (
+        $ctx := data;
+        
+        $integrations :=  $exists($ctx."kadzo.v2023.endpoints") ? (
+          $updated_integrations := $kadzo_extend_integrations_by_endpoints($ctx."kadzo.v2023.integrations", $ctx."kadzo.v2023.endpoints");
+          $integrations_with_endpoints := $ctx."kadzo.v2023.integrations".$spread()[*.endpoint];
+          $init_integrations := $ctx."kadzo.v2023.integrations" ~> | $ | {}, $integrations_with_endpoints.$keys() |;
+          $merge([$init_integrations, $updated_integrations.$spread()]);
+        ) : $ctx."kadzo.v2023.integrations";
+
+        $filterIntegrations := function($v){
+            $reduce(
+                $$.base.kadzo.rules.integrity.integrations.$spread().(
+                    $eval($.*, {"ctx": $ctx, "var": $v})
+                ),
+                function($i, $j){ $i and $j}
+            )
+        };
+      
+      
+        $ctx ~> | $ | $merge([$,
+            { "kadzo.v2023.integrations" : $merge($integrations.$spread()[$filterIntegrations($)]) }
+        ])|;
+      )
+
+  kadzo.v2023.asis:
+    origin:
+      base: kadzo.v2023.clear
+      helpers: kadzo.v2023.__helpers__
+    source: >
+      (
+          $getNotation := function($v) {(
+              [$each(helpers.kadzo.notation.systems, function ($fn, $fn_id){(
+                      $eval($fn, {"ctx": $v, "var": $v."live-stage", "type": "asis"}) ? $fn_id; 
+                  )}
+              )][0]
+          )};
+          
+          $getNotationKB := function($v) {(
+                        [$each(helpers.kadzo.notation.kb_systems, function($fn, $fn_id){(
+                            $eval($fn, $v) ? $fn_id; 
+                        )})][0]
+                    )};
+      
+          $getNotationTechServices := function($v) {(
+                        [$each(helpers.kadzo.notation.tech_services, function($fn, $fn_id) {(
+                            $eval($fn, $v) ? $fn_id; 
+                        )})][0]
+                    )};
+            
+          {
+              "meta-inf": {"schema-type": "as-is"},
+              "kadzo.v2023.clients" : base."kadzo.v2023.clients",
+              "kadzo.v2023.channels": $sift(base."kadzo.v2023.channels", function($v, $k){$v.status="Используется"}),
+              "kadzo.v2023.products": $sift(base."kadzo.v2023.products", function($v, $k){$v.status="Используется"}),
+              "kadzo.v2023.functions" : $sift(base."kadzo.v2023.functions", function($v, $k){$not($v."status"="Планируется")}),
+              "kadzo.v2023.systems" : $sift(base."kadzo.v2023.systems", function ($v, $k){($not($v."live-stage"="Эскиз"
+                                                                                                    or $v."live-stage"="В разработке / приобретение"
+                                                                                                    or $v."live-stage"="Внедрение / Не введена в эксплуатацию"
+                                                                                                    or $v."live-stage"="Архивная"
+                                                                                                    or $v."live-stage"="Отменена"
+                                                                                              ))})
+                                                            ~> | $.* | { "notation": $getNotation($) } |,
+              "kadzo.v2023.groups" : base."kadzo.v2023.groups",
+              "kadzo.v2023.business_objects" : base."kadzo.v2023.business_objects",
+              "kadzo.v2023.data_objects": $sift(base."kadzo.v2023.data_objects", function($v, $k){$not($v."status"="Планируется")}),
+              "kadzo.v2023.kb_systems": $sift(base."kadzo.v2023.kb_systems", function($v, $k){ $not($v.status="Создается") })
+                                                                   ~> | $.* | {"notation": $getNotationKB($)} |,
+              "kadzo.v2023.integrations": $sift(base."kadzo.v2023.integrations", function($v, $k){$not($v.status="Создается")}),
+              "kadzo.v2023.endpoints": $sift(base."kadzo.v2023.endpoints", function($v, $k){$not($v."status"="Планируется")}),
+              "kadzo.v2023.tech_services": $sift(base."kadzo.v2023.tech_services", function($v, $k){ $not($v.status="Создается") })
+                                              ~> | $.* | { "notation": $getNotationTechServices($) } |
+          };
+      )
+
+#  kadzo.v2023.planned:
+#    origin: kadzo.v2023
+#    source: >
+#      (
+#          $ ~> | $ | $merge([$,
+#              {
+#                  "meta-inf": {"schema-type": "planned"},
+#                  "kadzo.v2023.systems": $eval(datasets."kadzo.v2023.systems.planned".source)."kadzo.v2023.systems",
+#                  "kadzo.v2023.kb_systems": $eval(datasets."kadzo.v2023.kb_systems.tobe".source)."kadzo.v2023.kb_systems",
+#                  "kadzo.v2023.tech_services": $eval(datasets."kadzo.v2023.tech_services.tobe".source)."kadzo.v2023.tech_services"
+#              }
+#          ]) |;
+#      )
+
+  kadzo.v2023.tobe:
+    origin:
+      base: kadzo.v2023.clear
+      helpers: kadzo.v2023.__helpers__
+    source: >
+      (      
+          $getNotation := function($v) {(
+              [$each(helpers.kadzo.notation.systems, function($fn, $fn_id){(
+                  $eval($fn, {"ctx": $v, "var": $v."live-stage", "type": "tobe"}) ? $fn_id; 
+              )})][0]
+          )};
+
+          $getTitleIcon := function($v) {(
+                $res := $not($v.location = "Внешняя") and ($v."live-stage" = "Эскиз" 
+                          or $v."live-stage" = "В разработке / приобретение" 
+                            or $v."live-stage" = "Внедрение / Не введена в эксплуатацию") ? "➕     " :
+                            ($v.location = "Внутренняя") and ($v."change-type" = "Выводится из эксплуатации") ? "❌     "
+          )};
+      
+          $getNotationKB := function($v) {(
+                        [$each(helpers.kadzo.notation.kb_systems, function($fn, $fn_id){(
+                            $eval($fn, $v) ? $fn_id;
+                        )})][0]
+                    )};
+      
+          $getNotationTechServices := function($v) {(
+                        [$each(helpers.kadzo.notation.tech_services, function($fn, $fn_id){(
+                            $eval($fn, $v) ? $fn_id;
+                        )})][0]
+                    )};
+
+          {
+              "meta-inf": {"schema-type": "to-be"},
+              "kadzo.v2023.clients" : base."kadzo.v2023.clients",
+              "kadzo.v2023.channels": base."kadzo.v2023.channels",
+              "kadzo.v2023.products": base."kadzo.v2023.products",
+              "kadzo.v2023.functions" : base."kadzo.v2023.functions",
+              "kadzo.v2023.systems" : $sift(base."kadzo.v2023.systems", function($v, $k){ $not($v."live-stage"="Архивная" or $v."live-stage"="Отменена")})
+                                                                ~> | $.* | { "notation": $getNotation($), "titleIcon": $getTitleIcon($) }  |,
+              "kadzo.v2023.groups" : base."kadzo.v2023.groups",
+              "kadzo.v2023.business_objects" : base."kadzo.v2023.business_objects",
+              "kadzo.v2023.data_objects": base."kadzo.v2023.data_objects",
+              "kadzo.v2023.kb_systems": base."kadzo.v2023.kb_systems" ~> | $.* | { "notation": $getNotationKB($) } |,
+              "kadzo.v2023.integrations": base."kadzo.v2023.integrations",
+              "kadzo.v2023.endpoints": base."kadzo.v2023.endpoints",
+              "kadzo.v2023.tech_services": base."kadzo.v2023.tech_services" ~> | $.* | { "notation": $getNotationTechServices($) } |
+          }
+      )

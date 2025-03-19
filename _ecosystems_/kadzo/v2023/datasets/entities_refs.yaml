@@ -1,0 +1,8 @@
+datasets:
+  kadzo.v2023.entities.__refs__:
+    source: >
+      (
+          $merge($each( $.entities, function($v, $k) {(
+              $v.objects and ($k ~> /kadzo\.v2023/) ? {$k & "." & $v.objects.$keys()[0] : $k}
+          )}));
+      )

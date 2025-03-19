@@ -1,0 +1,6 @@
+datasets:
+  kadzo.v2023.channels:
+    source: >
+      (
+          {"kadzo.v2023.channels": $merge([$."kadzo.v2023.channels", $eval($eval(kadzo.settings.kadzo_channels_functions))."kadzo.v2023.channels"])};
+      )

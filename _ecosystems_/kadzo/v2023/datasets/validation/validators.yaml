@@ -1,0 +1,33 @@
+datasets:
+  kadzo.v2023.validators:
+    title: Все валидаторы
+    description: Реестр ошибок в архитектурных артефактах
+    origin:
+      goals: kadzo.v2023.validators.goals
+      strategy: kadzo.v2023.validators.strategy
+      clients: kadzo.v2023.validators.clients
+      channels: kadzo.v2023.validators.channels
+      products: kadzo.v2023.validators.products
+      processes: kadzo.v2023.validators.processes
+      business_objects: kadzo.v2023.validators.business_objects
+      data_objects: kadzo.v2023.validators.data_objects
+      systems: kadzo.v2023.validators.systems
+      functions: kadzo.v2023.validators.functions
+      groups: kadzo.v2023.validators.groups
+      integrations: kadzo.v2023.validators.integrations
+      kb_systems: kadzo.v2023.validators.kb_systems
+      tasks: kadzo.v2023.validators.tasks
+      tech_services: kadzo.v2023.validators.tech_services
+      tech_params: kadzo.v2023.validators.tech_params
+      unified_elements: kadzo.v2023.validators.unified_elements
+      criticality_passports: kadzo.v2023.validators.criticality_passports
+      domain: kadzo.v2023.validators.domain
+      enterprice_domain: kadzo.v2023.validators.domain_enterprise
+      endpoints: kadzo.v2023.validators.endpoints
+    source: >
+      (
+          [ goals, strategy, clients, channels, products, processes, 
+              business_objects, data_objects,
+              systems, functions, groups, integrations, kb_systems, tasks,
+              tech_services, tech_params, unified_elements, criticality_passports, domain, enterprice_domain, endpoints];
+      )

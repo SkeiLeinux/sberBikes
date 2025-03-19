@@ -1,0 +1,27 @@
+datasets:
+  kadzo.v2023.validators.channels:
+    title: Валидаторы каналов
+    description: Реестр ошибок в каналах
+    origin:
+      obj_by_domains: kadzo.v2023.channels_by_domains
+      channels: kadzo.v2023.channels
+      products: kadzo.v2023.products
+      clients: kadzo.v2023.clients
+      systems: kadzo.v2023.systems.united
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.channels";
+          $schema := entities_schema."kadzo.v2023.channels".schema;
+          $channels := channels;
+          $products := products;
+          $clients := clients;
+          $systems := systems;
+      
+          $errors := $each(validators.kadzo."channels.validation", function($v, $k){(
+                 $eval($v, {'channels': $channels, 'products': $products, 'clients': $clients, 'systems': $systems}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'channels', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

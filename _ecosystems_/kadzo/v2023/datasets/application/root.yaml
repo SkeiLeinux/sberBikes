@@ -1,0 +1,9 @@
+imports:
+   - tasks.yaml
+   - functions.yaml
+   - groups.yaml
+   - systems.yaml
+   - kb_systems.yaml
+   - integrations.yaml
+   - endpoints.yaml
+   - criticality_passports.yaml

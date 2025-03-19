@@ -1,0 +1,22 @@
+datasets:
+  kadzo.v2023.validators.strategy:
+    title: Валидаторы стратегии
+    description: Реестр ошибок в стратегии
+    origin:
+      strategy: kadzo.v2023.strategy
+      base: kadzo.__sber_settings__
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $domains := base.sber.domains.$keys();
+          $dataset := strategy;
+          $validators := validators;
+      
+          $map( $domains, function ($d){(
+                $errors := $each($validators.kadzo."strategy.validation", function($v, $k){(
+                    $eval($v, {'dataset': $dataset, 'domain': $d}).$map($, $append(?)) )} 
+                ).$map($, $append(?));
+                $errors := $errors ~> | $ | {'domain': $d, 'validator_type': 'strategy'} |;
+            )}
+          ).$map($, $append(?));
+      )

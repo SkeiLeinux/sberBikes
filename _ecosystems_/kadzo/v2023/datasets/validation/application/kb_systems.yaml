@@ -1,0 +1,21 @@
+datasets:
+  kadzo.v2023.validators.kb_systems:
+    title: Валидаторы систем кибербезопасности
+    description: Реестр ошибок в системах кибербезопасности
+    origin:
+      obj_by_domains: kadzo.v2023.kb_systems_by_domains
+      kb_systems: kadzo.v2023.kb_systems
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.kb_systems";
+          $schema := entities_schema."kadzo.v2023.kb_systems".schema;
+          $kb_systems := kb_systems;
+      
+          $errors := $each(validators.kadzo."kb_systems.validation", function($v, $k){(
+                 $eval($v, {'kb_systems': $kb_systems}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'kb_systems', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

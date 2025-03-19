@@ -1,0 +1,66 @@
+datasets:
+  kadzo.v2023.validators.domain:
+    title:  Валидаторы домена
+    description: Реестр ошибок в общих проверках
+    origin:
+      base: kadzo.__sber_settings__
+      validators: kadzo.validation.impl
+      goals: kadzo.v2023.goals
+      strategy: kadzo.v2023.strategy
+      clients: kadzo.v2023.clients
+      channels: kadzo.v2023.channels
+      products: kadzo.v2023.products
+      processes: kadzo.v2023.processes
+      business_objects: kadzo.v2023.business_objects
+      data_objects: kadzo.v2023.data_objects
+      groups: kadzo.v2023.groups
+      systems: kadzo.v2023.systems
+      functions: kadzo.v2023.functions
+      integrations: kadzo.v2023.integrations
+      tasks: kadzo.v2023.tasks
+      endpoints: kadzo.v2023.endpoints
+      kb_systems: kadzo.v2023.kb_systems
+      tech_services: kadzo.v2023.tech_services
+      tech_params: kadzo.v2023.tech_params
+    source: >
+      (
+          $domains := base.sber.domains.$keys();
+          $validators := validators;
+          
+          base.sber.kadzo.enterprise_mode = true ? [] : (
+            $dataset := $merge([goals, strategy, clients, channels, products, processes,
+                            business_objects, data_objects,
+                            groups, systems, functions, integrations, tasks, kb_systems,
+                            tech_services, tech_params, endpoints]);
+            $errors := [];
+            $init := [
+                {'domain': {
+                      'validators': $validators.kadzo."domain.validation",
+                      'objects': 'None'
+                    }
+                }
+            ];
+        
+            $get_errors := function($init, $domain, $dataset){(
+                $type_of_check := $init.$keys()[0];
+                $objects_errors :=      
+                    $init.*.validators.$spread().(
+                        (
+                            $validator := $.*;
+                            $eval($validator, {'dataset': $dataset, 'domain': $domain})
+                        );
+                    );
+                $objects_errors := $distinct($objects_errors.($exists($) and $count($.*) > 0 ? $ ));
+                $objects_errors := $objects_errors ~> | $ | {'domain': $domain, 'validator_type': $type_of_check} |;
+                $errors := $append($errors, $objects_errors);
+            )};
+            $errors := base.sber.kadzo.enterprise_mode = true ? [] : $append($errors, 
+                $domains.(
+                    $domain := $;
+                    $init.(
+                                $get_errors($, $domain, $dataset)
+                    )
+                )
+            )
+          )
+      )

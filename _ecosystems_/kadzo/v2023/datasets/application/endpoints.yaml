@@ -1,0 +1,6 @@
+datasets:
+  kadzo.v2023.endpoints:
+    source: >
+      (
+          {"kadzo.v2023.endpoints": $merge([$."kadzo.v2023.endpoints", $eval($eval(kadzo.settings.kadzo_endpoints_functions))."kadzo.v2023.endpoints"])};
+      )

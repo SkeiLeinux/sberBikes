@@ -1,0 +1,25 @@
+datasets:
+  kadzo.v2023.validators.systems:
+    title: Валидаторы автоматизированных систем и функциональных подсистем
+    description: Реестр ошибок в автоматизированных системах и функциональных подсистемах
+    origin:
+      obj_by_domains: kadzo.v2023.systems_by_domains
+      systems: kadzo.v2023.systems
+      functions: kadzo.v2023.functions.united
+      groups: kadzo.v2023.groups.united
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.systems";
+          $schema := entities_schema."kadzo.v2023.systems".schema;
+          $systems := systems;
+          $functions := functions;
+          $groups := groups;
+      
+          $errors := $each(validators.kadzo."systems.validation", function($v, $k){(
+                 $eval($v, {'systems': $systems, 'functions': $functions, 'groups': $groups}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+      
+          $errors := [ $errors ~> | $ | {'validator_type': 'systems', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

@@ -1,0 +1,8 @@
+datasets:
+  kadzo.v2023.entities.schema:
+    source: >
+      (
+          $.entities ~> $each(?, function($v, $k){(
+                  $exists($v.schema) and ($k ~> /kadzo\.v2023/) ? {$k : $v ~> | $ | {}, ["presentations"] | }
+              )})
+      )

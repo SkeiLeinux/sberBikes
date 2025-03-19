@@ -1,0 +1,50 @@
+datasets:
+  kadzo.v2023.validators.criticality_passports:
+    title: Валидатор паспортов критичности
+    description: Реестр ошибок об ошибках в паспортах критичности
+    origin:
+      base: kadzo.__sber_settings__
+      criticality_passport: kadzo.v2023.criticality_passports
+      calculator: kadzo.v2023__criticality_calculator__
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $domains := base.sber.domains.$keys();
+          $schema := entities_schema;
+          $validators := validators;
+          $dataset := $merge([criticality_passport, calculator]);
+          $errors := [];
+          $init := [
+              {'criticality_passport': {
+                    'validators': $validators.kadzo."criticality_passport.validation",
+                    'objects': $dataset."kadzo.v2023.criticality_passport"
+                  }
+              }
+          ];
+
+          $get_errors := function($init, $domain, $dataset){(
+              $matcher_invoke := $eval("/^" & $domain & "\\./i");
+              $type_of_check := $init.$keys()[0];
+              $objects_func := $init.*.objects = 'None' ? 'None' : $init.*.objects.$spread()[$keys() ~> $matcher_invoke];
+              $objects_errors :=
+                  $init.*.validators.$spread().(
+                          $validator := $.*;
+                          $objects_func.$spread().(
+                              $eval($validator, {'obj': $, 'dataset': $dataset, 'domain': $domain})
+                          );
+                  );
+              $objects_errors := $distinct($objects_errors.($exists($) and $count($.*) > 0 ? $ ));
+              $objects_errors := $objects_errors ~> | $ | {'domain': $domain, 'validator_type': $type_of_check} |;
+              $errors := $append($errors, $objects_errors);
+          )};
+      
+          $errors := $append($errors, 
+              $domains.(
+                  $domain := $;
+                  $init.(
+                      $get_errors($, $domain, $dataset)
+                  )
+              )
+          )
+      )

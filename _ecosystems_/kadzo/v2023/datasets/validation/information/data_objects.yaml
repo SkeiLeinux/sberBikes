@@ -1,0 +1,25 @@
+datasets:
+  kadzo.v2023.validators.data_objects:
+    title: Валидаторы объектов данных
+    description: Реестр ошибок в объектах данных
+    origin:
+      obj_by_domains: kadzo.v2023.data_objects_by_domains
+      data_objects: kadzo.v2023.data_objects
+      business_objects: kadzo.v2023.business_objects
+      systems: kadzo.v2023.systems.united
+      entities_schema: kadzo.v2023.entities.schema
+      validators: kadzo.validation.impl
+    source: >
+      (
+          $obj_by_domains := obj_by_domains."kadzo.v2023.data_objects";
+          $schema := entities_schema."kadzo.v2023.data_objects".schema;
+          $data_objects := data_objects;
+          $business_objects := business_objects;
+          $systems := systems;
+      
+          $errors := $each(validators.kadzo."data_objects.validation", function($v, $k){(
+                 $eval($v, {'data_objects': $data_objects, 'systems': $systems, 'business_objects': $business_objects}).$map($, $append(?)); )} 
+            ).$map($, $append(?));
+
+          $errors := [ $errors ~> | $ | {'validator_type': 'data_objects', 'domain' : $lookup($obj_by_domains, $.id).domain } | ];
+      )

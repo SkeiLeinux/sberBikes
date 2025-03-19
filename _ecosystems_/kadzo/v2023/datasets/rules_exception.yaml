@@ -1,0 +1,7 @@
+datasets:
+  kadzo.rules.exception:
+    title: Исключения к проверкам КА ДЗО
+    source: >
+      (
+          $.rules.exceptions
+      )

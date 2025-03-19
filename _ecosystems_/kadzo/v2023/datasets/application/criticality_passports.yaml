@@ -1,0 +1,7 @@
+datasets:
+  # Вырезаем из манифеста паспорта критичности
+  kadzo.v2023.criticality_passports:
+    source: >
+      (
+          {"kadzo.v2023.criticality_passport": $."kadzo.v2023.criticality_passport"}
+      )

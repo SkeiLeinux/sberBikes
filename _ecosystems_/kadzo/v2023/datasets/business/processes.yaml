@@ -1,0 +1,6 @@
+datasets:
+  kadzo.v2023.processes:
+    source: >
+      (
+          {"kadzo.v2023.processes": $merge([$."kadzo.v2023.processes", $eval($eval(kadzo.settings.kadzo_processes_functions))."kadzo.v2023.processes"])};
+      )

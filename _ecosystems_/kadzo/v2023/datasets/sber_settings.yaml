@@ -1,0 +1,6 @@
+datasets:
+  kadzo.__sber_settings__:
+    source: >
+      (
+          { "sber": $.sber };
+      )
