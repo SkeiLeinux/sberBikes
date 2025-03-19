@@ -1,0 +1,10 @@
+imports:
+  - registry.yaml
+  - card.yaml
+#  - card_plain.yaml
+  - summary.yaml
+  - summary_livestage.yaml
+  - contexts.yaml
+  - by_integrations.yaml
+  - by_business_object.yaml
+  - system_data_objects.yaml

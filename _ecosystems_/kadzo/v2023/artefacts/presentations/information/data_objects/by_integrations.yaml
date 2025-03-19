@@ -1,0 +1,51 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      data_objects_by_integration:
+        type: table
+        params:
+          type: object
+          properties:
+            id:
+              title: Идентификатор интеграционного потока
+              type: string
+          required:
+            - id
+        headers:
+          - value: id
+            text: Идентификатор
+            link: link
+          - value: title
+            text: Наименование
+            align: left
+            link: link
+          - value: category
+            text: Категория
+            align: left
+          - value: status
+            text: Статус
+            align: left
+          - value: master_system
+            text: Мастер система
+            link: master_system_link
+        origin:
+          integrations: kadzo.v2023.integrations
+          data_objects: kadzo.v2023.data_objects
+        source: >
+          (
+              $data_obj := [$lookup(integrations."kadzo.v2023.integrations", $params.id)."data-objects"];
+              [ $sift(data_objects."kadzo.v2023.data_objects", function($v, $k){ $k in $data_obj })
+                  ~> $each(?, function($v, $k) {(
+                  {
+                      "id": $k,
+                      "link": "/entities/kadzo.v2023.data_objects/card?id=" & $k,
+                      "title": $v.title,
+                      "category": $v.category,
+                      "status": $v.status,
+                      "business_object": $v.business_object,
+                      "master_system": $v.master_system,
+                      "master_system_link": "/entities/kadzo.v2023.systems/card?id=" & $v.master_system
+                  }
+                )})
+              ]
+          )

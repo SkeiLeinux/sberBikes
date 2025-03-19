@@ -1,0 +1,27 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      card_plain:
+        type: markdown
+        template: ../templates/data_objects.md
+        origin: kadzo.v2023
+        source: >
+          (
+              $ctx := $;
+              $lookup($ctx."kadzo.v2023.data_objects", $params.id).(
+                  $ms := $lookup($ctx."kadzo.v2023.systems", $.master_system);
+                  $bo := $lookup($ctx."kadzo.v2023.business_objects", $.business_object);
+              {
+                      "id": $params.id,
+                      "title": $.title,
+                      "category": $.category,
+                      "status": $.status,
+                      "business_object": $.business_object,
+                      "business_object_title": $bo.title,
+                      "business_object_link": "/entities/kadzo.v2023.business_objects/card?id=" & $.business_object, 
+                      "master_system": $.master_system,
+                      "master_system_title": $ms.title,
+                      "master_system_link": "/entities/kadzo.v2023.systems/card?id=" & $.master_system
+                  }
+              )
+          )

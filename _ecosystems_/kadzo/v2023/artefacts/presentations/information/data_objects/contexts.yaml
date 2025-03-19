@@ -1,0 +1,35 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      data_objects_contexts:
+        title: Контексты передачи объекта данных
+        params:
+          type: object
+          properties:
+            id:
+              title: Идентификатор объекта данных
+              type: string
+          required:
+            - id
+        type: mkr-select
+        source: >
+          (
+              [
+                  {
+                      "title": "Текущий контекст объекта данных",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_asis?data=" & $params.id
+                  },
+                  {
+                      "title": "Текущий контекст объекта данных (расширение до бизнес-слоя)",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_asis_extended?data=" & $params.id
+                  },
+                  {
+                      "title": "Целевой контекст объекта данных",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_tobe?data=" & $params.id
+                  },
+                  {
+                      "title": "Целевой контекст объекта данных (расширение до бизнес-слоя)",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_tobe_extended?data=" & $params.id
+                  }
+              ]
+          )

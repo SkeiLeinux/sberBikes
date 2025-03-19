@@ -1,0 +1,35 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      summary:
+        title: Сводка по объекту данных
+        params:
+          type: object
+          properties:
+            id:
+              title: Идентификатор объекта данных
+              type: string
+          required:
+            - id
+        type: markdown
+        template: ../templates/summary.md
+        origin:
+          base: kadzo.v2023
+          schema: kadzo.v2023.entities.schema
+          refs: kadzo.v2023.entities.__refs__
+        source: >
+          (
+            $data_object_id := $params.id;
+            $ctx:= base;
+            $append([
+                {
+                    "title": "Идентификатор",
+                    "data": [{"content": $data_object_id}]
+                }
+              ],
+              $props_to_summary($data_object_id,
+                            $ctx."kadzo.v2023.data_objects",
+                            schema."kadzo.v2023.data_objects".schema.patternProperties.*.properties,
+                            $ctx, refs)
+            );
+          )

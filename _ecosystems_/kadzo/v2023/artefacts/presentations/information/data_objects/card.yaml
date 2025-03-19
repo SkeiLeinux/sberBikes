@@ -1,0 +1,54 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      card:
+        title: Карточка объекта данных
+        params:
+          type: object
+          properties:
+            id:
+              title: Идентификатор объекта данных
+              type: string
+          required:
+            - id
+        type: mkr-grid
+        widgets:
+          summary:
+            title: Сводка по объекту данных
+            entity: kadzo.v2023.data_objects
+            presentation: summary
+            order: 10
+            align: "<"
+            style:
+              margin: 4px
+              border: true
+          summary_livestage:
+            title: Жизненный цикл
+            entity: kadzo.v2023.data_objects
+            presentation: summary_livestage
+            order: 10
+            align: ">"
+            style:
+              margin: 4px
+              border: true
+          integrations:
+            title: Потоки, передающие объект данных
+            entity: kadzo.v2023.integrations
+            presentation: integrations_by_data
+            order: 20
+            style:
+              margin: 4px
+              border: true
+          context:
+            title: Контексты передачи данных
+            entity: kadzo.v2023.data_objects
+            presentation: data_objects_contexts
+            order: 30
+            style:
+              margin: 4px
+              border: true
+        origin: kadzo.v2023.__presentations__.widgets
+        source: >
+          (
+                $lookup( $lookup($, "__widgets__.kadzo.v2023.data_objects.card"), $params.id);
+          )

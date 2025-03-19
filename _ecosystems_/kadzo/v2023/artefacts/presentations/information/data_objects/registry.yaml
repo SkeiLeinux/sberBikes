@@ -1,0 +1,62 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      registry:
+        type: table
+        params:
+          type: object
+          properties:
+            domain:
+              title: Идентификатор домена
+              type: string
+          required:
+            - domain
+        headers:
+          - value: id
+            text: Идентификатор
+            link: link
+          - value: title
+            text: Наименование
+            align: left
+            link: link
+          - value: category
+            text: Категория
+            align: left
+          - value: status
+            text: Статус
+            align: left
+          - value: business_object
+            text: Связь с бизнес-объектом
+            align: left
+            link: business_object_link
+          - value: master_system
+            text: Мастер система
+            align: left
+            link: system_link
+          - value: comments
+            text: Комментарии, риски, проблемы
+
+        origin: 
+          data_objects: kadzo.v2023.data_objects
+          business_objects: kadzo.v2023.business_objects
+          systems: kadzo.v2023.systems.united
+
+        source: >
+          (
+              $data_objects := data_objects;
+              $business_objects := business_objects;
+              $systems := systems;
+              $matcher := $eval('/^' & $params.domain & '\\./i');
+              [$.$data_objects."kadzo.v2023.data_objects".$spread()[$.$keys() ~> $matcher].{
+                  "id": $keys()[0], 
+                  "link": "/entities/kadzo.v2023.data_objects/card?id=" & $keys()[0],
+                  "title": *.title,
+                  "category": *.category,
+                  "status": *.status,
+                  "business_object": (*.business_object ? ($title := $lookup($$.$business_objects."kadzo.v2023.business_objects", *.business_object).title; $title ? $title : "Бизнес-объект не найден: " & *.business_object) : ""),
+                  "business_object_link": "/entities/kadzo.v2023.business_objects/card?id=" & *.business_object,
+                  "master_system": (*.master_system ? ($title := $lookup($$.$systems."kadzo.v2023.systems", *.master_system).title; $title ? $title : "АС не найдена: " & *.master_system) : ""),
+                  "system_link": "/entities/kadzo.v2023.systems/card?id=" & *.master_system,
+                  "comments": *.comments
+              }]
+          )

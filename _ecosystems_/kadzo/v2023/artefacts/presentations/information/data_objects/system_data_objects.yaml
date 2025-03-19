@@ -1,0 +1,35 @@
+entities:
+  kadzo.v2023.data_objects:
+    presentations:
+      system_data_objects:
+        type: table
+        headers:
+          - value: title
+            text: Наименование
+            link: link
+          - value: category
+            text: Категория
+            align: left
+          - value: status
+            text: Статус
+            align: left
+
+        origin: kadzo.v2023.data_objects
+
+        source: >
+          (
+              [$sift($."kadzo.v2023.data_objects", function($v, $k) {$v.master_system=$params.id})
+                  ~> $each(?, function($v, $k){(
+                      {
+                        "id": $k,
+                        "link": "/entities/kadzo.v2023.data_objects/card?id=" & $k,
+                        "title": $v.title,
+                        "category": $v.category,
+                        "status": $v.status,
+                        "business_object": $v.business_object,
+                        "business_object_link": "/entities/kadzo.v2023.business_objects/card?id=" & $v.business_object,
+                        "master_system": $v.master_system
+                      }
+                    )})
+              ]
+          )
