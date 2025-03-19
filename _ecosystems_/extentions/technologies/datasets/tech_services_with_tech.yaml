@@ -1,0 +1,40 @@
+datasets:
+  kadzo.tech_services.with_tech:
+    origin:
+      base: kadzo.techologies.ds
+      tech_services: kadzo.v2023.tech_services
+      kb_systems: kadzo.v2023.kb_systems
+    source: >
+      (
+          $technologies := base."kadzo.technologies";
+          $tech_services := tech_services;
+          $kb_systems := kb_systems;
+          $tech_aliases_map := $merge($map($technologies.$spread(), function($v){
+                  $merge($v.*.aliases.{$lowercase($): $v})
+              }));
+
+          $services := $merge($tech_services."kadzo.v2023.tech_services".$spread().(
+            $tech := $lookup($tech_aliases_map, $lowercase($.*.title));
+            {
+              $keys() : $merge([$.*, 
+                  {
+                      "tech_name": $lookup($tech_aliases_map, $lowercase($.*.title)).*.name,
+                      "tech_id": $lookup($tech_aliases_map, $lowercase($.*.title)).$keys(),
+                      "type": "kadzo.v2023.tech_services"
+                  }]) 
+            };
+          ));
+          $ksystems := $merge($kb_systems."kadzo.v2023.kb_systems".$spread().(
+             $tech := $lookup($tech_aliases_map, $lowercase($.*.title));
+             {
+               $keys() : $merge([$.*, 
+                   {
+                       "tech_name": $lookup($tech_aliases_map, $lowercase($.*.title)).*.name,
+                       "tech_id": $lookup($tech_aliases_map, $lowercase($.*.title)).$keys(),
+                       "type": "kadzo.v2023.kb_systems"
+                   }]) 
+             }; 
+          ));
+           
+          $merge([$services, $ksystems]);
+      )
