@@ -61,6 +61,6 @@ kadzo.v2023.functions:
     title: Процессинг платежей
     description: Процессинг платежей
     systems:
-      - ecogroup.bike_rent.systems.bike_rent_back
+      - ecogroup.bike_rent.external_systems.sber_pay
     status: Планируется
     target: Целевое
