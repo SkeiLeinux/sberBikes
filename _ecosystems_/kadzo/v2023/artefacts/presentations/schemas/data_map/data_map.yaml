@@ -1,0 +1,84 @@
+entities:
+  kadzo.v2023.data_map:
+    data: >
+      (
+          $ctx := $.base;
+          $domain := $params.domain;
+          $matcher := $eval('/^' & $domain & '\\./i');
+          $domain_business_objects := $merge($.base."kadzo.v2023.business_objects".$spread()[$.$keys() ~> $matcher]);
+          $domain_data_objects := $merge($.base."kadzo.v2023.data_objects".$spread()[$.$keys() ~> $matcher]);
+          $domain_data_objects := $merge($domain_data_objects.$spread().({ $keys()[0] : $merge([{"id": $keys()[0]}, $.*])}));
+      
+          /* Удаляем свойство business_object, если это не строка (ссылка на бизнес-объект) */
+          $domain_data_objects := $each($domain_data_objects, function($v, $key){(
+            $type($v.business_object) = 'string' 
+                ? {$key : $v}
+                : ( {$key : $v ~> | $ | {} , 'business_object' |});
+          )});
+      
+          $bdo := $eval($.helpers.kadzo."helpers.functions".business_data_objects, {"ctx": $ctx, "var": $domain_data_objects});
+          $bo := [$domain_business_objects.$spread().(
+            $do := [$lookup($bdo, $keys()[0]).data_objects.($lookup($domain_data_objects, $))];
+            { 
+              "id": $keys()[0],
+              "title": *.title,
+              "notation": *.notation,
+              "data_objects": $do
+            }
+          )];
+          {
+              "business_objects": $bo
+          };
+      )
+
+    presentations:
+      data_map_select:
+        title: Карта данных
+        params:
+          type: object
+          properties:
+            domain:
+              title: Домен
+              type: string
+          required:
+            - domain
+        type: mkr-select
+        source: >
+          (
+              $domain := $params.domain;
+              [
+                  {
+                      "title": "Карта данных (текущая)",
+                      "src": "@entity/kadzo.v2023.data_map/data_map_as_is?domain=" & $domain
+                  },
+                  {
+                      "title": "Карта данных (целевая)",
+                      "src": "@entity/kadzo.v2023.data_map/data_map_to_be?domain=" & $domain
+                  }
+              ]
+          )
+      data_map_as_is:
+        type: plantuml
+        template: data_map.puml
+        origin:
+          entities: kadzo.v2023.entities
+          helpers: kadzo.v2023.__helpers__
+          base: kadzo.v2023.asis
+        source: >
+          (
+              $result := $eval(entities."kadzo.v2023.data_map".data);
+              $merge([$result, {"title": "Карта данных (текущая)"}]);
+          )
+
+      data_map_to_be:
+        type: plantuml
+        template: data_map.puml
+        origin:
+          entities: kadzo.v2023.entities
+          helpers: kadzo.v2023.__helpers__
+          base: kadzo.v2023.tobe
+        source: >
+          (
+              $result := $eval(entities."kadzo.v2023.data_map".data);
+              $merge([$result, {"title": "Карта данных (целевая)"}]);
+          )

@@ -1,0 +1,132 @@
+entities:
+  kadzo.v2023.data_context:
+    data: >
+      (
+        $ctx := ctx;
+        $current_id := params.data;
+        /*$log($current_id, "current_id");*/
+        $ms_id := $lookup($ctx."kadzo.v2023.data_objects", $current_id).master_system;
+        /*$log($ms_id, "data_context master system");*/
+
+        $integrations := $sift($ctx."kadzo.v2023.integrations", function ($v,$k){ $current_id in $v."data-objects" });
+
+        $context_systems := $sift($ctx."kadzo.v2023.systems", function ($v, $k){ $k in [$integrations.*.source, $integrations.*.consumer, $ms_id] });
+      
+        $endpoint_ids := [$integrations.*.endpoint];
+        $ts_used_ep := $endpoint_ids.(
+          $point := $lookup($ctx."kadzo.v2023.endpoints", $);
+          $point.gates.($lookup($ctx."kadzo.v2023.tech_services", $) ? $)
+        );
+
+        $tech_services := $merge($ctx."kadzo.v2023.tech_services".$spread()[$.$keys()[0] in $ts_used_ep]);
+      
+        /* Разделяем набор систем на АС и ФП, подтягиваем родительские АС (если их не было) */
+        $subsystems := $sift($context_systems, function($v, $k){ $exists($v.parent)});
+        $parents_systems := $sift($ctx."kadzo.v2023.systems", function($v, $k){ $k in $subsystems.*.parent });
+
+        $systems := $merge([$sift($context_systems, function($v, $k){$not($exists($v.parent))}), $parents_systems]);
+            
+        $domain_data_objects := [{$current_id : $lookup($ctx."kadzo.v2023.data_objects", $current_id)}];
+      
+        $channels := (params.extended) ? $sift($ctx."kadzo.v2023.channels", function($v, $k){ ($v.systems)@$a1.($context_systems.$keys())@$a2[$a1=$a2].$k  } );
+
+        $clients := (params.extended) ? $sift($ctx."kadzo.v2023.clients", function($v, $k){ $k in $channels.*.clients });
+
+        $merge([$eval(helpers.kadzo."helpers.functions".data_schema_data, 
+                {
+                    "ctx": $ctx,
+                    "helpers": helpers,
+                    "var": {
+                        "systems" : $systems,
+                        "subsystems": $subsystems,
+                        "data_objects": $domain_data_objects,
+                        "groups": $ctx."kadzo.v2023.groups",
+                        "integrations": $integrations,
+                        "tech_services": $tech_services,
+                        "channels": $channels,
+                        "clients": $clients
+                    }
+                }
+          ), {"title": "Контекст данных " & $current.*.title}]);
+      )
+    presentations:
+      data_context_select:
+        title: Контекст передачи данных
+        params:
+          type: object
+          properties:
+            data:
+              title: Идентификатор объекта данных
+              type: string
+          required:
+            - data
+        type: mkr-select
+        source: >
+          (
+              $data := $params.data;
+              [
+                  {
+                      "title": "Текущий контекст данных",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_asis?data=" & $data
+                  },
+                  {
+                      "title": "Текущий контекст данных (расширенный)",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_asis_extended?data=" & $data
+                  },
+                  {
+                      "title": "Целевой контекст данных",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_tobe?data=" & $data
+                  },
+                  {
+                      "title": "Целевой контекст данных (расширенный)",
+                      "src": "@entity/kadzo.v2023.data_context/data_context_tobe_extended?data=" & $data
+                  }
+              ]
+          )
+      data_context_asis:
+        template: ../templates/data_schema.puml
+        type: plantuml
+        origin:
+          entities: kadzo.v2023.entities
+          helpers: kadzo.v2023.__helpers__
+          base: kadzo.v2023.asis
+        source: >
+          (
+              $eval(entities."kadzo.v2023.data_context".data, {"ctx": base, "helpers": helpers, "params": $params});
+          )
+
+      data_context_asis_extended:
+        template: ../templates/data_schema.puml
+        type: plantuml
+        origin:
+          entities: kadzo.v2023.entities
+          helpers: kadzo.v2023.__helpers__
+          base: kadzo.v2023.asis
+        source: >
+          (
+              $eval(entities."kadzo.v2023.data_context".data, {"ctx": base, "helpers": helpers, "params": $merge([$params, {"extended": 1}])});
+          )
+
+      data_context_tobe:
+        template: ../templates/data_schema_to_be.puml
+        type: plantuml
+        origin:
+          entities: kadzo.v2023.entities
+          helpers: kadzo.v2023.__helpers__
+          base: kadzo.v2023.tobe
+        source: >
+          (
+              $eval(entities."kadzo.v2023.data_context".data, {"ctx": base, "helpers": helpers, "params": $params});
+          )
+
+      data_context_tobe_extended:
+        template: ../templates/data_schema_to_be.puml
+        type: plantuml
+        origin:
+          entities: kadzo.v2023.entities
+          helpers: kadzo.v2023.__helpers__
+          base: kadzo.v2023.tobe
+        source: >
+          (
+              $eval(entities."kadzo.v2023.data_context".data, {"ctx": base, "helpers": helpers, "params": $merge([$params, {"extended": 1}])});
+          )

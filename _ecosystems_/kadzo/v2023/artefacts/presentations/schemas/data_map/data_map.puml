@@ -1,0 +1,105 @@
+'!pragma ratio 0.3
+!pragma horizontalLineBetweenDifferentPackageAllowed
+'!pragma layout elk
+'Общее позиционирование
+
+skinparam {
+
+	wrapWidth 200
+
+	maxMessageSize 200
+
+	'hide stereotype
+
+	tabSize 5
+
+	defaultfontname Arial
+
+	roundCorner 10
+
+	linetype ortho
+
+	'linetype polyline
+
+	nodesep 20
+
+	ranksep 20
+
+	shadowing true
+
+	'padding 10
+
+    hyperlinkColor black
+
+    hyperlinkUnderline false
+
+}
+
+'top to bottom direction
+left to right direction
+
+hide circle
+
+hide empty members
+
+
+skinparam component{
+
+	fontsize 14
+
+	fontstyle bold
+
+	borderthickness 1
+
+	attributefontsize 11
+
+	bordercolor #4e4948
+
+	backgroundcolor #92d050
+
+}
+
+'Стили для (объектов данных)
+
+skinparam class {
+
+    wrapWidth 250
+	fontsize 14
+
+	attributeFontSize 10
+
+	fontstyle bold
+	borderthickness 1
+	attributefontsize 11
+	bordercolor #4e4948
+
+	backgroundcolor<<Платежные данные (карты)>> orange
+	bordercolor<<Платежные данные (карты)>> gray
+
+	backgroundcolor<<Перс данные>> #ffff8a
+	bordercolor<<Перс данные>> gray
+
+	backgroundcolor<<Коммерческая тайна>> #92d050
+	bordercolor<<Коммерческая тайна>> gray
+
+	backgroundcolor<<Медицинские данные>> lightblue
+	bordercolor<<Медицинские данные>> gray
+}
+
+'hide stereotype
+
+set namespaceSeparator none
+title {{&title}}
+
+@startuml
+hide << Внешняя >> stereotype
+
+{{#business_objects}}
+rectangle "{{&title}}" as {{id}} [[/entities/kadzo.v2023.business_objects/card?id={{id}}]]{
+{{#data_objects}}
+    class "{{&title}}" as {{id}} <<{{category}}>> [[/entities/kadzo.v2023.data_objects/card?id={{id}}]]
+{{/data_objects}}
+}
+{{/business_objects}}
+
+@enduml
