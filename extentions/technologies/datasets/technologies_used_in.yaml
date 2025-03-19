@@ -1,0 +1,19 @@
+datasets:
+  kadzo.technologies_used_in:
+    origin:
+      base: kadzo.techologies.ds
+      tech_params_with_tech: kadzo.tech_params.with_tech
+    source: >
+      (
+          $base := base;
+          $ta := tech_params_with_tech.$spread();
+          $ta := $ta {*.seafera.software.id : $.$keys()};
+          $ta := $merge($ta.$spread() ~> | $ | {$.$keys(): {"used_in": [ $.* ]}}|);
+            
+          { "kadzo.technologies" : $merge( $base."kadzo.technologies".$spread().(
+                                      {
+                                        $.$keys()[0] : $merge([$.*, $lookup($ta, $.$keys()[0])]) 
+                                      }
+                                  ))
+          };
+      )

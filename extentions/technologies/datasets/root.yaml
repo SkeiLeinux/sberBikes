@@ -1,0 +1,4 @@
+imports:
+  - tech_params_with_tech.yaml
+  - technologies_used_in.yaml
+  - tech_services_with_tech.yaml
